@@ -73,13 +73,13 @@
 ---
 
 ## 🚀 Project Story
-Recently, our company underwent a major restructuring. During this process, many of our colleagues left, and we found ourselves in the midst of significant change. We considered moving to other companies, and many organizations showed interest in us. But for some reason, we couldn’t bring ourselves to take that step.
+Recently, our company went through a major restructuring. During that process, many of our colleagues left, and we found ourselves right in the middle of the change. We did consider changing companies, and many organizations wanted us. But for some reason, we couldn’t bring ourselves to take that step.
 
 
-The answer turned out to be simpler than we thought. What we truly wanted wasn’t a career change. What we really wanted was to work together. So, we started thinking about how we could survive and thrive together.
+The answer was simpler than we thought. What we truly wanted wasn’t a career change. What we really wanted was to work together. So, we started thinking about how we could survive and thrive together.
 
 
-That’s how this project began. We didn’t set out to create something monumental, but the goal was clear: to build a space where we could work in a way we enjoy, learn from each other, and grow as a team.
+That’s how this project started. We needed a small space where we could work together. We didn’t set out to create something huge, but the goal was simple: to create an opportunity where we could work in a way we enjoy, learn from each other, and grow together.
 
 
-We don’t want to lose any more colleagues. That’s why we’re creating a space where we can collaborate, pool our energy, and build this project together.
+We don’t want to lose any more colleagues. That’s why we’re creating a space where we can work together, pooling our energy, and building this project as a result.
