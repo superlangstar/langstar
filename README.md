@@ -1,5 +1,6 @@
+![LangStart Project Logo](./ReadMe/langstar_start.png)
+
 # 🌟 LangStar
-![LangStart Project Logo](./ReadMe/langstar_logo.png)
 
 **Langstar** is a visual platform that enables both developers and non-developers to easily create **LLM-based agent models** using **drag-and-drop** components. Once built, these models can be automatically converted into **Python code** for deployment.
 
