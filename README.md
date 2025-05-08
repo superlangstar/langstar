@@ -1,4 +1,5 @@
-# 🌟 Langstar
+# 🌟 LangStar
+(./ReadMe/langstar_logo.png)
 
 **Langstar** is a visual platform that enables both developers and non-developers to easily create **LLM-based agent models** using **drag-and-drop** components. Once built, these models can be automatically converted into **Python code** for deployment.
 
@@ -14,13 +15,23 @@
 
 ---
 
-## ✨ Key Features
+# ✨ Key Features
 
-- ✅ Visual editor for building agent workflows with drag-and-drop  
-- ✅ Modular components: LLMs, Tools, Memory, and custom logic blocks  
-- ✅ Auto-generation of Python code from visual flows  
-- ✅ One-click deployment (e.g., FastAPI, Streamlit)  
-- ✅ Project saving and loading for version management
+- ✅ **Visual Agent Builder**  
+  Drag-and-drop UI to visually compose agents, tools, memory blocks, and conditionals without writing a line of code.
+
+- ✅ **Modular Architecture**  
+  Components like LLMs, APIs, documents, RAG pipelines, and memory modules can be easily reused and extended.
+
+- ✅ **Automatic Code Generation**  
+  Instantly convert your workflow into production-ready Python code — readable and customizable.
+
+- ✅ **Real-Time Block Execution for Debugging**  
+  Execute each block independently during design time and immediately view inputs, outputs, and errors.  
+  This dramatically improves debugging and understanding of how data flows through the agent.
+
+- ✅ **Extensible for Developers**  
+  For advanced users, Langstar offers hooks and customization options for logic and code injection.
 
 ---
 
@@ -39,11 +50,9 @@
    Interact with the deployed agent using a real-time chat interface based on your completed workflow.
 
    ![Chat Interface](./ReadMe/langstar3.png)
----
 
-## ⚙️ Installation
+4. **Debug in Real Time with Per-Block Execution**  
+   Run and inspect each block individually during design.  
+   Check intermediate outputs and fix issues early — no need to run the entire workflow every time.
 
-```bash
-git clone https://github.com/your-org/langstar.git
-cd langstar
-pip install -r requirements.txt
+   ![Debug Block](./ReadMe/langstar4.png)
