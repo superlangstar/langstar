@@ -9,7 +9,9 @@
 
 **Langstar** is a visual platform that enables both developers and non-developers to easily create **LLM-based agent models** using **drag-and-drop** components. Once built, these models can be automatically converted into **Python code** for deployment.
 
+
 ---
+
 
 ## 🎯 Project Goals
 
@@ -19,7 +21,9 @@
 - Enable one-click deployment and testing  
 - Save development time and promote accessibility
 
+
 ---
+
 
 # ✨ Key Features
 
@@ -39,7 +43,9 @@
 - ✅ **Extensible for Developers**  
   For advanced users, Langstar offers hooks and customization options for logic and code injection.
 
+
 ---
+
 
 ## 🖼️ Screenshots
 1. **Create your custom workflow**  
@@ -62,3 +68,18 @@
    Check intermediate outputs and fix issues early — no need to run the entire workflow every time.
 
    ![Debug Block](./ReadMe/langstar4.png)
+
+
+---
+
+## 🚀 Project Story
+Recently, our company underwent a major restructuring. During this process, many of our colleagues left, and we found ourselves in the midst of significant change. We considered moving to other companies, and many organizations showed interest in us. But for some reason, we couldn’t bring ourselves to take that step.
+
+
+The answer turned out to be simpler than we thought. What we truly wanted wasn’t a career change. What we really wanted was to work together. So, we started thinking about how we could survive and thrive together.
+
+
+That’s how this project began. We didn’t set out to create something monumental, but the goal was clear: to build a space where we could work in a way we enjoy, learn from each other, and grow as a team.
+
+
+We don’t want to lose any more colleagues. That’s why we’re creating a space where we can collaborate, pool our energy, and build this project together.
