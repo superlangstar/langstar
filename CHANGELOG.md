@@ -1,43 +1,74 @@
-# Changelog
+[2025-05-19]
 
-모든 중요한 변경사항은 이 파일에 기록됩니다.
-
-## [2025-05-19]
 ### Changed
-- END 노드 기능 변경
+
+- Improved END node functionality: Integrated to extract only the necessary parts from the chat and provide focused responses.
 
 ### Added
-- Merge 노드 추가
-- 모델 API 관리 기능 추가
 
-## [2025-05-16]
+- Official addition of Merge node: Completed a structure that allows multiple workflow branches to be merged into a unified flow.
+- Added model API management features: Enables registration of various language models, version control, and configuration management.
+
+---
+
+[2025-05-16]
+
 ### Designed
-- Merge 노드 기능 설계
 
-## [2025-05-15]
+- Completed design of Merge node functionality: Finalized operation logic and UI design to handle branching integration within workflows.
+
+---
+
+[2025-05-15]
+
 ### Added
-- Workflow 저장 기능 추가
 
-## [2025-05-14]
+- Added workflow saving feature: Users can now save and reuse designed workflows, with support for both local and server storage.
+
+---
+
+[2025-05-14]
+
 ### Added
-- Chatbot 기능 추가
 
-## [2025-05-13]
+- Added chatbot functionality: Supports building real-time conversational chatbots within the user interface, integrated with LLMs.
+
+---
+
+[2025-05-13]
+
 ### Added
-- Agent API 추가
 
-## [2025-05-12]
+- Added Agent API: Provides endpoints to create and control agents capable of performing various tasks. Enables integration between Prompts and Tools.
+
+---
+
+[2025-05-12]
+
 ### Changed
-- Agent 기능 변경
 
-## [2025-05-09]
-### Added
-- Tool API 추가
+- Enhanced Agent architecture: Improved from single-task to multi-task capabilities, allowing for more flexible task composition.
 
-## [2025-05-08]
-### Added
-- Prompt API 추가
+---
 
-## [2025-05-07]
+[2025-05-09]
+
 ### Added
-- Start API 추가
+
+- Added Tool API: Allows registration and invocation of tools that connect to external APIs, databases, computation modules, and more.
+
+---
+
+[2025-05-08]
+
+### Added
+
+- Added Prompt API: Introduced prompt invocation features to handle diverse user input scenarios.
+
+---
+
+[2025-05-07]
+
+### Added
+
+- Added Start API: Introduced API to define the entry point of a workflow, with event-based trigger configuration.
