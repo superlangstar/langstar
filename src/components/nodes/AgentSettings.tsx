@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useFlowStore } from '../../store/flowStore';
-import { X, ChevronDown } from 'lucide-react';
+import { X, ChevronDown, AlertCircle } from 'lucide-react';
 
 // Mock AI connections - in a real app, this would come from your store or API
 const mockAIConnections = [
@@ -32,24 +32,43 @@ interface AgentSettingsProps {
 }
 
 const AgentSettings: React.FC<AgentSettingsProps> = ({ nodeId }) => {
-  const { nodes, updateNodeData } = useFlowStore();
+  const { nodes, edges, updateNodeData, getNodeById } = useFlowStore();
   const node = nodes.find(n => n.id === nodeId);
   const [isToolsOpen, setIsToolsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   
-  // Get all system prompt nodes
-  const systemPromptNodes = nodes.filter(n => n.type === 'systemPromptNode');
-  
-  // Get all prompt nodes
-  const promptNodes = nodes.filter(n => n.type === 'promptNode');
-  
+  // 이전 노드에서 사용 가능한 입력 키 및 연결 상태 가져오기
+  const [availableInputKeys, setAvailableInputKeys] = useState<string[]>([]);
+  const [isSourceConnected, setIsSourceConnected] = useState<boolean>(false);
+  const [hasValidSourceOutput, setHasValidSourceOutput] = useState<boolean>(false);
+
+  useEffect(() => {
+    const incomingEdge = edges.find(edge => edge.target === nodeId);
+    setIsSourceConnected(!!incomingEdge);
+
+    if (incomingEdge) {
+      const sourceNode = getNodeById(incomingEdge.source);
+      const sourceOutput = sourceNode?.data?.output;
+      if (sourceOutput && typeof sourceOutput === 'object' && sourceOutput !== null && !Array.isArray(sourceOutput) && Object.keys(sourceOutput).length > 0) {
+        setHasValidSourceOutput(true);
+        setAvailableInputKeys(Object.keys(sourceNode.data.output));
+      } else {
+        setHasValidSourceOutput(false);
+        setAvailableInputKeys([]);
+      }
+    } else {
+      setHasValidSourceOutput(false);
+      setAvailableInputKeys([]);
+    }
+  }, [nodes, edges, nodeId, getNodeById]); // getNodeById는 store에서 오므로 직접적인 의존성은 아니지만, nodes/edges 변경 시 재계산 필요
+
   // Get all groups nodes and extract memory and tools groups
   const groupsNode = nodes.find(n => n.type === 'groupsNode');
   const memoryGroups = groupsNode?.data.config?.groups?.filter(g => g.type === 'memory') || [];
   const toolsGroups = groupsNode?.data.config?.groups?.filter(g => g.type === 'tools') || [];
 
   // Get selected tools from node config
-  const selectedTools = node?.data.config?.selectedTools || [];
+  const currentTools = node?.data.config?.tools || []; // 'selectedTools' -> 'tools'로 변경
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -72,58 +91,75 @@ const AgentSettings: React.FC<AgentSettingsProps> = ({ nodeId }) => {
     });
   };
 
-  const handleSystemPromptChange = (value: string) => {
+  const handleSystemPromptInputKeyChange = (value: string) => {
     updateNodeData(nodeId, {
       ...node?.data,
       config: {
         ...node?.data.config,
-        systemPromptNode: value
+        systemPromptInputKey: value // 'systemPromptNode' 대신 'systemPromptInputKey' 사용
       }
     });
   };
 
-  const handleUserPromptChange = (value: string) => {
+  const handleUserPromptInputKeyChange = (value: string) => {
     updateNodeData(nodeId, {
       ...node?.data,
       config: {
         ...node?.data.config,
-        userPromptNode: value
+        userPromptInputKey: value // 'userPromptNode' 대신 'userPromptInputKey' 사용
       }
     });
   };
 
-  const handleChatHistoryChange = (value: string) => {
+  const handleAgentOutputVariableChange = (value: string) => {
     updateNodeData(nodeId, {
       ...node?.data,
       config: {
         ...node?.data.config,
-        chatHistoryNode: value
+        agentOutputVariable: value
       }
+    });
+  };
+
+
+  const handleMemoryGroupChange = (groupId: string) => {
+    // 선택된 groupId를 사용하여 memoryGroups 배열에서 해당 그룹을 찾습니다.
+    const selectedGroup = memoryGroups.find(g => g.id === groupId);
+    // 해당 그룹의 memoryType을 가져옵니다. 없으면 빈 문자열로 처리합니다.
+    const memoryTypeString = selectedGroup?.memoryType || '';
+
+    updateNodeData(nodeId, {
+      ...node?.data,
+      config: {
+        ...node?.data.config,
+        memoryGroup: groupId, // 여전히 그룹 ID는 저장해둘 수 있습니다 (UI 표시용 또는 다른 용도)
+        memoryTypeString: memoryTypeString // 실제 memoryType 문자열을 저장
+      } 
     });
   };
 
   const toggleTool = (toolId: string) => {
-    const newSelectedTools = selectedTools.includes(toolId)
-      ? selectedTools.filter(id => id !== toolId)
-      : [...selectedTools, toolId];
+    const newTools = currentTools.includes(toolId)
+      ? currentTools.filter(id => id !== toolId)
+      : [...currentTools, toolId];
 
     updateNodeData(nodeId, {
       ...node?.data,
       config: {
         ...node?.data.config,
-        selectedTools: newSelectedTools
+        tools: newTools // 'selectedTools' -> 'tools'로 변경
       }
     });
   };
 
   const removeTool = (event: React.MouseEvent, toolId: string) => {
     event.stopPropagation();
-    const newSelectedTools = selectedTools.filter(id => id !== toolId);
+    const newTools = currentTools.filter(id => id !== toolId);
     updateNodeData(nodeId, {
       ...node?.data,
       config: {
         ...node?.data.config,
-        selectedTools: newSelectedTools
+        tools: newTools // 'selectedTools' -> 'tools'로 변경
       }
     });
   };
@@ -135,6 +171,50 @@ const AgentSettings: React.FC<AgentSettingsProps> = ({ nodeId }) => {
     <div className="space-y-6">
       <div className="space-y-4">
         <h3 className="text-sm font-medium text-gray-700">Agent Settings</h3>
+
+        {/* Output Variable Section - Placed at the top */}
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-gray-600">
+            Output Variable
+          </label>
+          <div className="relative">
+            <select
+              value={node?.data.config?.agentOutputVariable || ''}
+              onChange={(e) => handleAgentOutputVariableChange(e.target.value)}
+              className={`w-full px-3 py-2 border ${
+                // 이전 노드가 연결되지 않았거나, 유효한 출력이 없을 때 약간 흐리게 표시
+                (!isSourceConnected || !hasValidSourceOutput) && availableInputKeys.length === 0 ? 'bg-gray-50 text-gray-400' : 'bg-white'
+              } border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm`}
+            >
+              <option value="">Select output variable (required)</option>
+              {/* 현재 설정된 값이자 기본값 (availableInputKeys에 없다면 'New/Default'로 표시) */}
+              {node?.data.config?.agentOutputVariable &&
+               node.data.config.agentOutputVariable !== "" && 
+               !availableInputKeys.includes(node.data.config.agentOutputVariable) && (
+                <option key={node.data.config.agentOutputVariable} value={node.data.config.agentOutputVariable}>
+                  {node.data.config.agentOutputVariable} (New/Default)
+                </option>
+              )}
+              {availableInputKeys.map((variable) => (
+                <option key={variable} value={variable}>
+                  {variable} (Overwrite)
+                </option>
+              ))}
+            </select>
+            {!isSourceConnected && (
+              <div className="flex items-center mt-1 text-amber-500 text-xs">
+                <AlertCircle size={12} className="mr-1" />
+                Connect an input node to see available keys to overwrite.
+              </div>
+            )}
+            {isSourceConnected && !hasValidSourceOutput && availableInputKeys.length === 0 && (
+              <div className="flex items-center mt-1 text-amber-500 text-xs">
+                <AlertCircle size={12} className="mr-1" />
+                Execute the connected node to see its output keys to overwrite.
+              </div>
+            )}
+          </div>
+        </div>
         
         <div className="space-y-2">
           <label className="block text-sm font-medium text-gray-600">
@@ -161,47 +241,49 @@ const AgentSettings: React.FC<AgentSettingsProps> = ({ nodeId }) => {
 
         <div className="space-y-2">
           <label className="block text-sm font-medium text-gray-600">
-            System Prompt
+            System Prompt (Input Key)
           </label>
           <select
-            value={node?.data.config?.systemPromptNode || ''}
-            onChange={(e) => handleSystemPromptChange(e.target.value)}
+            value={node?.data.config?.systemPromptInputKey || ''}
+            onChange={(e) => handleSystemPromptInputKeyChange(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
           >
-            <option value="">Select system prompt node</option>
-            {systemPromptNodes.map((n) => (
-              <option key={n.id} value={n.id}>
-                {n.data.label}
+            <option value="">Select an input key for system prompt</option>
+            {availableInputKeys.map((key) => (
+              <option key={key} value={key}>
+                {key}
               </option>
             ))}
           </select>
-          {systemPromptNodes.length === 0 && (
-            <p className="text-xs text-amber-500">
-              No system prompt nodes found in the workflow
-            </p>
+          {!isSourceConnected && (
+            <p className="text-xs text-amber-500 mt-1">Connect an input node to see available keys.</p>
+          )}
+          {isSourceConnected && !hasValidSourceOutput && availableInputKeys.length === 0 && (
+            <p className="text-xs text-amber-500 mt-1">Execute the connected node to populate input keys.</p>
           )}
         </div>
 
         <div className="space-y-2">
           <label className="block text-sm font-medium text-gray-600">
-            User Prompt
+            User Prompt (Input Key)
           </label>
           <select
-            value={node?.data.config?.userPromptNode || ''}
-            onChange={(e) => handleUserPromptChange(e.target.value)}
+            value={node?.data.config?.userPromptInputKey || ''}
+            onChange={(e) => handleUserPromptInputKeyChange(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
           >
-            <option value="">Select user prompt node</option>
-            {promptNodes.map((n) => (
-              <option key={n.id} value={n.id}>
-                {n.data.label}
+            <option value="">Select an input key for user prompt</option>
+            {availableInputKeys.map((key) => (
+              <option key={key} value={key}>
+                {key}
               </option>
             ))}
           </select>
-          {promptNodes.length === 0 && (
-            <p className="text-xs text-amber-500">
-              No prompt nodes found in the workflow
-            </p>
+          {!isSourceConnected && (
+            <p className="text-xs text-amber-500 mt-1">Connect an input node to see available keys.</p>
+          )}
+          {isSourceConnected && !hasValidSourceOutput && availableInputKeys.length === 0 && (
+            <p className="text-xs text-amber-500 mt-1">Execute the connected node to populate input keys.</p>
           )}
         </div>
 
@@ -210,8 +292,8 @@ const AgentSettings: React.FC<AgentSettingsProps> = ({ nodeId }) => {
             Memory Group
           </label>
           <select
-            value={node?.data.config?.chatHistoryNode || ''}
-            onChange={(e) => handleChatHistoryChange(e.target.value)}
+            value={node?.data.config?.memoryGroup || ''} // UI 표시는 그룹 ID 기준
+            onChange={(e) => handleMemoryGroupChange(e.target.value)} // 핸들러에는 그룹 ID 전달
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
           >
             <option value="">Select memory group</option>
@@ -236,9 +318,9 @@ const AgentSettings: React.FC<AgentSettingsProps> = ({ nodeId }) => {
             className="bg-white border border-gray-300 rounded-md p-2 min-h-[42px] flex flex-wrap items-center cursor-pointer"
             onClick={() => setIsToolsOpen(!isToolsOpen)}
           >
-            {selectedTools.length > 0 ? (
+            {currentTools.length > 0 ? ( // 'selectedTools' -> 'currentTools'로 변경
               toolsGroups
-                .filter(tool => selectedTools.includes(tool.id))
+                .filter(tool => currentTools.includes(tool.id)) // 'selectedTools' -> 'currentTools'로 변경
                 .map((tool) => (
                   <span
                     key={tool.id}
@@ -267,14 +349,14 @@ const AgentSettings: React.FC<AgentSettingsProps> = ({ nodeId }) => {
                   <div
                     key={tool.id}
                     className={`px-4 py-2 cursor-pointer hover:bg-gray-100 ${
-                      selectedTools.includes(tool.id) ? 'bg-gray-50' : ''
+                      currentTools.includes(tool.id) ? 'bg-gray-50' : '' // 'selectedTools' -> 'currentTools'로 변경
                     }`}
                     onClick={() => toggleTool(tool.id)}
                   >
                     <div className="flex items-center">
                       <input
                         type="checkbox"
-                        checked={selectedTools.includes(tool.id)}
+                        checked={currentTools.includes(tool.id)} // 'selectedTools' -> 'currentTools'로 변경
                         onChange={() => {}}
                         className="mr-2"
                       />

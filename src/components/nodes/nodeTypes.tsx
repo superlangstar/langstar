@@ -1,6 +1,6 @@
 import React from 'react';
 import { 
-  Bot, Split, FileCode, Play, Square, MessageSquare, Settings, Group,
+  Bot, Split, FileCode, Play, Square, MessageSquare, Settings, Group, GitMerge,
   Database, Cpu
 } from 'lucide-react';
 import { CustomNode } from './CustomNode';
@@ -125,6 +125,18 @@ const RAGNode = (props: any) => (
   />
 );
 
+const MergeNode = (props: any) => (
+  <CustomNode
+    {...props}
+    data={{
+      ...props.data,
+      icon: <GitMerge size={16} />, // nodeCategories.tsx와 아이콘 일치, 크기 조정
+      nodeType: 'mergeNode',
+      description: 'Merge inputs from multiple nodes' // nodeCategories.tsx와 설명 일치
+    }}
+  />
+);
+
 export const nodeTypes = {
   agentNode: AgentNode,
   conditionNode: ConditionNode,
@@ -136,4 +148,5 @@ export const nodeTypes = {
   groupsNode: GroupsNode,
   embeddingNode: EmbeddingNode,
   ragNode: RAGNode,
+  mergeNode: MergeNode, // MergeNode 추가
 };

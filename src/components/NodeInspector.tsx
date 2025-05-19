@@ -10,6 +10,8 @@ import StartSettings from './nodes/StartSettings';
 import GroupsSettings from './nodes/GroupsSettings';
 import EmbeddingSettings from './nodes/EmbeddingSettings';
 import RAGSettings from './nodes/RAGSettings';
+import MergeSettings from './nodes/MergeSettings'; // MergeSettings import
+import EndNodeSettings from './nodes/EndNodeSettings'; // EndNodeSettings import
 
 interface NodeInspectorProps {
   nodeId: string;
@@ -57,15 +59,19 @@ const NodeInspector: React.FC<NodeInspectorProps> = ({ nodeId, onClose }) => {
       let currentTabIsValid = true;
 
       if (nodeType === 'startNode') {
-        newDefaultTab = 'settings';
-        if (activeTab !== 'settings') currentTabIsValid = false;
+        newDefaultTab = 'settings'; // StartNode는 항상 settings가 기본
+        if (activeTab !== 'settings') currentTabIsValid = false; 
       } else if (nodeType === 'endNode') {
-        newDefaultTab = 'input_data';
-        if (activeTab !== 'input_data') currentTabIsValid = false;
+        // EndNode는 input_data와 settings 탭을 가질 수 있음
+        const validTabsForEndNode = ['input_data', 'settings'];
+        if (!validTabsForEndNode.includes(activeTab)) {
+          currentTabIsValid = false;
+          newDefaultTab = 'settings'; // EndNode의 기본 탭을 settings로 설정 (또는 input_data)
+        }
       } else if (nodeType === 'promptNode' || nodeType === 'systemPromptNode') {
         if (activeTab === 'settings') currentTabIsValid = false; // Original settings tab is gone
         newDefaultTab = 'input_data';
-      } else if (['agentNode', 'conditionNode', 'groupsNode', 'embeddingNode', 'ragNode'].includes(nodeType)) {
+      } else if (['agentNode', 'conditionNode', 'groupsNode', 'embeddingNode', 'ragNode', 'mergeNode'].includes(nodeType)) { // mergeNode 추가
         if (activeTab === 'code') currentTabIsValid = false; // Code tab is gone
         newDefaultTab = 'input_data';
       }
@@ -115,6 +121,7 @@ const NodeInspector: React.FC<NodeInspectorProps> = ({ nodeId, onClose }) => {
   const isEmbeddingNode = currentNode.type === 'embeddingNode';
   const isRAGNode = currentNode.type === 'ragNode';
   const isEndNode = currentNode.type === 'endNode';
+  const isMergeNode = currentNode.type === 'mergeNode'; // isMergeNode 정의 추가
 
   return (
     <div className="w-96 bg-white border-l border-gray-200 h-full overflow-hidden flex flex-col shadow-md z-10">
@@ -167,7 +174,7 @@ const NodeInspector: React.FC<NodeInspectorProps> = ({ nodeId, onClose }) => {
                 <Settings size={16} className="mr-1" /> Settings
               </button>
             );
-          } else if (!(isStartNode || isEndNode || isAgentNode || isConditionNode || isGroupsNode || isEmbeddingNode || isRAGNode)) { // Regular Code tab
+          } else if (!(isStartNode || isEndNode || isAgentNode || isConditionNode || isGroupsNode || isEmbeddingNode || isRAGNode || isMergeNode)) { // mergeNode 추가하여 Code 탭 제외
             return (
               <button
                 className={`flex-1 py-2 flex justify-center items-center ${
@@ -183,7 +190,7 @@ const NodeInspector: React.FC<NodeInspectorProps> = ({ nodeId, onClose }) => {
         })()}
 
         {/* Settings Tab (original, for nodes that have it and it's not repurposed) */}
-        {!(isEndNode || isPromptNode || isSystemPromptNode) && (
+        {!(isPromptNode || isSystemPromptNode) && ( // EndNode도 Settings 탭을 가질 수 있도록 isEndNode 조건 제거
           <button
             className={`flex-1 py-2 flex justify-center items-center ${
               activeTab === 'settings' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-600'
@@ -289,6 +296,9 @@ const NodeInspector: React.FC<NodeInspectorProps> = ({ nodeId, onClose }) => {
               {isGroupsNode && <GroupsSettings nodeId={nodeId} />}
               {isEmbeddingNode && <EmbeddingSettings nodeId={nodeId} />}
               {isRAGNode && <RAGSettings nodeId={nodeId} />}
+              {isMergeNode && <MergeSettings nodeId={nodeId} />} {/* MergeSettings 렌더링 추가 */}
+              {isEndNode && <EndNodeSettings nodeId={nodeId} />} {/* EndNodeSettings 렌더링 추가 */}
+              {/* MergeNode는 별도의 상세 설정 UI가 없으므로, 이 부분에 추가할 필요는 없습니다. 기본 Node Type만 표시됩니다. */}
             </div>
           </div>
         )}

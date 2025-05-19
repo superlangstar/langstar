@@ -1,6 +1,6 @@
 import React from 'react';
 import { 
-  Bot, Split, FileCode, Play, Square, MessageSquare, Settings, Group,
+  Bot, Split, FileCode, Play, Square, MessageSquare, Settings, Group, GitMerge,
   Database, Cpu
 } from 'lucide-react';
 
@@ -69,6 +69,12 @@ export const nodeCategories: NodeCategory[] = [
         label: 'Groups',
         description: 'Organize and manage node groups',
         icon: <Group size={20} />
+      },
+      {
+        type: 'mergeNode',
+        label: 'Merge',
+        description: 'Merge inputs from multiple nodes',
+        icon: <GitMerge size={20} />
       }
     ]
   },
